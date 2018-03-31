@@ -1,2 +1,0 @@
-# cicdatamarkettools
-this is readme
