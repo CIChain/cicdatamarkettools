@@ -15,7 +15,7 @@ class Okex(object):
                 "Content-type" : "application/x-www-form-urlencoded",
                 }
         
-    def ticker_do(self,tx_name, api_type):
+    def ticker_do(self,tx_name):
         request_url = self.base_url + 'ticker.do?symbol=' + tx_name
         print(request_url)
         res_json = self.get_url_json(request_url)
@@ -82,7 +82,7 @@ class Okex(object):
         
 if __name__ == "__main__":
     okex = Okex()
-    #okex.ticker_do('cic_usdt')
+    okex.ticker_do('cic_usdt')
     
-    okex.get_symbol_by_configs()
-    okex.get_all_data('1day')
+    #okex.get_symbol_by_configs()
+    #okex.get_all_data('1day')
