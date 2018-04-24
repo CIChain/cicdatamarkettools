@@ -8,9 +8,9 @@ from selenium import webdriver
 
 class TokenBacePro():
     def __init__(self):
-        self.db = Mysqldb()
-        #chromedriver = 'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
-        #self.driver = webdriver.Chrome(executable_path = chromedriver)
+        self.db = Mysqldb(config.MySqlHost, config.MySqlUser, config.MySqlPasswd, config.MySqlDb, config.MySqlPort)
+        chromedriver = 'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
+        self.driver = webdriver.Chrome(executable_path = chromedriver)
 
     def get_token_address(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -42,7 +42,6 @@ class TokenBacePro():
                         print(updata_str)
                         print('update err, token = ', token_name)
                 elif len(sel_str) == 2:
-                    print('====================')
                     print('token_name repeat: token_name = ', token_name, ',address = ', address)
                 else:
                     insert_str = "INSERT INTO token_base (token_name, en_name, erc20_contract, created_at, updata_at )"
@@ -132,11 +131,11 @@ class TokenBacePro():
         
     def driver_close(self):
         print()
-        #self.driver.close()
+        self.driver.close()
                         
 if __name__ == "__main__":
     token_bace = TokenBacePro()
-    #token_bace.get_token_address()
-    #token_bace.get_token_data()
+    token_bace.get_token_address()
+    token_bace.get_token_data()
     token_bace.get_fxh_address()
     token_bace.driver_close()

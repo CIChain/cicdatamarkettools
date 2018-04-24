@@ -2,13 +2,19 @@
 # -*- coding:utf-8 -*-
 
 import pymysql
-import config
 
 class Mysqldb:
+    def __init__(self, host, user, passwd, db, port):
+        self.host = host
+        self.user = user
+        self.passwd = passwd
+        self.db = db
+        self.port = port
+        
     def getCon(self):
         try:
-            conn = pymysql.connect(host=config.MySqlHost, user=config.MySqlUser, passwd=config.MySqlPasswd,
-                                   db=config.MySqlDb, port=config.MySqlPort, charset='utf8')
+            conn = pymysql.connect(host=self.host, user=self.user, passwd=self.passwd, db=self.db,
+                                   port=self.port, charset='utf8')
             return conn
         except MySQLdb.Error as e:
             print("Mysqldb con Error:%s");
