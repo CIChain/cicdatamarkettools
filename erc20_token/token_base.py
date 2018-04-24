@@ -58,18 +58,18 @@ class TokenBacePro():
     def get_token_data(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print(recordDate)
-        sel_str = "SELECT id, erc20_contract from token_base_copy WHERE erc20_contract <> ''"
+        sel_str = "SELECT id, erc20_contract, github_address, twitter_address, facebook_address, telegraph_address, whitepaper_address from token_base WHERE erc20_contract <> ''"
         db_res = self.db.select(sel_str)
         
         for token in db_res:
             url = config.eth_token_url + token[1]
             self.driver.get(url)
                         
-            git_address = ''
-            telegram_address = ''
-            facebook_address = ''
-            twitter_address = ''
-            whitepaper_address = ''
+            git_address = token[2]
+            twitter_address = token[3]
+            facebook_address = token[4]
+            telegram_address = token[5]
+            whitepaper_address = token[6]
             
             for element in self.driver.find_elements_by_xpath('//*[@id="ContentPlaceHolder1_tr_officialsite_2"]/td[2]/ul/li'):
                 original_str = element.find_element_by_xpath('./a').get_attribute('data-original-title')
@@ -94,27 +94,30 @@ class TokenBacePro():
             except Exception as e:
                 print(updata_str)
                 print('update err internet_data, token_id = ', token[0])
-                
+       
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print(recordDate)
         
-    def get_fxh_data(self):
+    def get_fxh_address(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print(recordDate)
         
-        sel_str = "SELECT en_name, erc20_contract from token_base_copy WHERE erc20_contract <> ''"
+        sel_str = "SELECT en_name, erc20_contract, fxh_address from token_base WHERE erc20_contract <> ''"
         db_res = self.db.select(sel_str)
+        print(len(db_res))
         
         for token in db_res:
-            url = config.fxh_base_url + token[0].replace('.', '')
-            res_html = common_fun.get_url_html(url)
+            fxh_address = token[2]
+            if fxh_address == '':
+                fxh_address = config.fxh_base_url + token[0].replace('.', '')
+            res_html = common_fun.get_url_html(fxh_address)
             if len(res_html):
                 cn_name = ''
                 name = res_html.xpath('//*[@id="baseInfo"]/div[1]/div[1]/h1/text()')
                 if len(name) > 1:
-                    cn_name = name[2].strip()
+                    cn_name = name[1].strip()
                 
-                updata_str = "UPDATE token_base_copy SET fxh_address='" + url + "', cn_name='" + cn_name + "'"
+                updata_str = "UPDATE token_base SET fxh_address='" + fxh_address + "', cn_name='" + cn_name + "'"
                 updata_str += " where en_name ='" + str(token[0]) + "'"
                 
                 try:
@@ -123,9 +126,9 @@ class TokenBacePro():
                     print(updata_str)
                     print('update err internet_data, token_id = ', token[0])
             else:
-                print('==========', token[0])
-        
-        
+                print(token[0], token[1])
+                print(fxh_address)
+                
         
     def driver_close(self):
         print()
@@ -133,6 +136,7 @@ class TokenBacePro():
                         
 if __name__ == "__main__":
     token_bace = TokenBacePro()
+    #token_bace.get_token_address()
     #token_bace.get_token_data()
-    token_bace.get_fxh_data()
+    token_bace.get_fxh_address()
     token_bace.driver_close()
