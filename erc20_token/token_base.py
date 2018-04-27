@@ -5,6 +5,9 @@ import time
 import common_fun
 import config
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 class TokenBacePro():
     def __init__(self):
@@ -15,9 +18,12 @@ class TokenBacePro():
     def get_token_address(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print(recordDate)
+        self.driver.get(config.eth_tokens_url)
         
-        res_html = common_fun.get_url_html(config.eth_tokens_url)
-        page_max = res_html.xpath('/html/body/div[1]/div[4]/div[4]/div/p/span/b[2]/text()')[0]
+        xpath_str = '//*[@id="ContentPlaceHolder1_divpagingpanel"]/div[2]/p/span/b[1]'
+        element_present = EC.text_to_be_present_in_element((By.XPATH, xpath_str),'1')
+        WebDriverWait(self.driver, 30, 1).until(element_present)
+        page_max = self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divpagingpanel"]/div[2]/p/span/b[2]').text
         print(page_max)
         for page_index in range(1, int(page_max) + 1):
             page_url = config.eth_tokens_url + '?p=' + str(page_index)
@@ -70,6 +76,9 @@ class TokenBacePro():
             telegram_address = token[5]
             whitepaper_address = token[6]
             
+            total_issued = self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[1]/td[2]').text
+            total_issued = total_issued.split('(')[0]
+            
             for element in self.driver.find_elements_by_xpath('//*[@id="ContentPlaceHolder1_tr_officialsite_2"]/td[2]/ul/li'):
                 original_str = element.find_element_by_xpath('./a').get_attribute('data-original-title')
                 if original_str.startswith('Github'):
@@ -85,7 +94,7 @@ class TokenBacePro():
                     
             updata_str = "UPDATE token_base SET github_address='" + git_address + "', twitter_address='" + str(
                     twitter_address) + "', facebook_address='" + facebook_address + "', telegraph_address='" + str(
-                    telegram_address) + "', whitepaper_address='" + whitepaper_address + "',created_at='" + recordDate + "'"
+                    telegram_address) + "', whitepaper_address='" + whitepaper_address + "', total_issued='" + total_issued + "',created_at='" + recordDate + "'"
             updata_str += " where id =" + str(token[0])
             
             try:
@@ -130,7 +139,6 @@ class TokenBacePro():
                 
         
     def driver_close(self):
-        print()
         self.driver.close()
                         
 if __name__ == "__main__":
