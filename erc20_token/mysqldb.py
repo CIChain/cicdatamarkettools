@@ -73,6 +73,22 @@ class Mysqldb:
         finally:
             cur.close()
             con.close()
+            
+    def insert_list(self, sql_list):
+        try:
+            con = self.getCon()
+            cur = con.cursor()
+            for sql in sql_list:
+                count = cur.execute(sql)
+            con.commit()
+            return count
+        except MySQLdb.Error as e:
+            con.rollback()
+            print("Mysqldb insert Error:%s");
+        finally:
+            cur.close()
+            con.close()
+            
     def delete(self, sql):
         try:
             con = self.getCon()
