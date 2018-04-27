@@ -41,7 +41,7 @@ class TokenBacePro():
                 sel_res = self.db.select(sel_str)
                 if len(sel_res) == 1:
                     updata_str = "UPDATE token_base SET erc20_contract='" + address
-                    updata_str += "' where token_name = '" + token_name + "'"
+                    updata_str += "' where token_name = '" + token_name + "' and en_name = '" + en_name + "'"
                     try:
                         self.db.update(updata_str)
                     except Exception as e:
