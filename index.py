@@ -1,8 +1,8 @@
 # !/usr/bin/python
 # -*- coding:utf-8 -*-
 
-from erc20_data import Erc20Data
-from get_tx_data import TxDataPro
+from erc20_token.erc20_data import Erc20Data
+from erc20_token.get_tx_data import TxDataPro
 
 # 日志
 # access_log 用于记录每一个访问请求
