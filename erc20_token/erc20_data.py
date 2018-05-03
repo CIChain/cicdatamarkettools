@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 from mysqldb import Mysqldb
 import time
-import common_fun
 import config
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,8 +11,7 @@ from selenium.webdriver.common.by import By
 class Erc20Data():
     def __init__(self):
         self.db = Mysqldb(config.MySqlHost, config.MySqlUser, config.MySqlPasswd, config.MySqlDb, config.MySqlPort)
-        chromedriver = 'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
-        self.driver = webdriver.Chrome(executable_path = chromedriver)
+        self.driver = webdriver.Chrome(executable_path = config.chromedriver)
     
     #由于网络原因，数据获取经常性的中断，所以需要分成多步来获取数据，原则上数据每天更新一次，每天0点启动脚本
     #首先通过时间戳和token id生成erc20_data的唯一标识，并且给每条数据标记未获取
