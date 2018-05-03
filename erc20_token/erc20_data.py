@@ -20,7 +20,7 @@ class Erc20Data():
     #通过数据库筛选出来所有未获取的数据得唯一标识和erc20_contract，并更新数据
     def erc20_data_key(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        print(recordDate)
+        print('erc20_data_key', recordDate)
         timestamps = int(time.time())
         sel_str = "SELECT id, erc20_contract from token_base WHERE erc20_contract <> ''"
         
@@ -146,6 +146,8 @@ class Erc20Data():
                 except:
                     print('Timed out waiting for page to load. id_timestamps:', token_bace[0])
             time.sleep(30)
+        recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print('get_top100_hold', recordDate)
         
     def driver_close(self):
         self.driver.close()
@@ -153,11 +155,8 @@ class Erc20Data():
         
 if __name__ == "__main__":
     erc20_pro = Erc20Data()
-    recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print(recordDate)
     erc20_pro.erc20_data_key()
     erc20_pro.get_erc20_data()
     erc20_pro.get_top100_hold()
     erc20_pro.driver_close()
-    recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print(recordDate)
+    

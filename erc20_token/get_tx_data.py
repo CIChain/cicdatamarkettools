@@ -14,6 +14,7 @@ class TxDataPro():
         db_res = self.db.select(sel_str)
         timestamps = int(time.time())
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print('get_tx_data', recordDate)
         for token_bace in db_res:
             id_timestamps = str(token_bace[0]) + '_' + str(timestamps)
             res_html = common_fun.get_url_html(token_bace[1])
@@ -46,6 +47,9 @@ class TxDataPro():
             except Exception as e:
                 print(insert_str)
                 print('insert err, token = ', token_bace[0])
+                
+        recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print('get_tx_data', recordDate)
 
 if __name__ == "__main__":
     tx_data = TxDataPro()
