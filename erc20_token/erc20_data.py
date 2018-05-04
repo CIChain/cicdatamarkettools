@@ -24,9 +24,8 @@ class Erc20Data():
         
         res_sel = self.db.select(sel_str)
         for token_bace in res_sel:
-            id_timestamps = str(token_bace[0]) + '_' + str(timestamps)
-            insert_str = "INSERT INTO erc20_data (id_timestamps, token_id, top100_detail)"
-            insert_str += "VALUES ('" + id_timestamps + "'," + str(token_bace[0]) + "," + '0' +")"
+            insert_str = "INSERT INTO erc20_data (token_id, get_data_time, top100_detail)"
+            insert_str += "VALUES (" + str(token_bace[0]) + "," + str(timestamps) + "," + '0' +")"
             
             try:
                 self.db.insert(insert_str)
@@ -38,14 +37,14 @@ class Erc20Data():
     def get_erc20_data(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_erc20_data', recordDate)
-        sel_str = "SELECT a.id_timestamps, b.erc20_contract from erc20_data as a, token_base as b WHERE (a.token_hold_num = -1 or a.token_tx_num = -1)AND a.token_id = b.id"
+        sel_str = "SELECT a.token_id, a.get_data_time, b.erc20_contract from erc20_data as a, token_base as b WHERE (a.token_hold_num = -1 or a.token_tx_num = -1)AND a.token_id = b.id"
         while True:
             res_sel = self.db.select(sel_str)
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
             for token_bace in res_sel:
-                url = config.eth_token_url + token_bace[1]
+                url = config.eth_token_url + token_bace[2]
                 self.driver.get(url)
                 
                 token_holders = self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
@@ -53,7 +52,7 @@ class Erc20Data():
                 tx_num = self.driver.find_element_by_xpath('//*[@id="totaltxns"]').text
     
                 updata_str = "UPDATE erc20_data SET token_hold_num=" + token_holders + ", token_tx_num=" + str(tx_num)
-                updata_str += " where id_timestamps ='" + str(token_bace[0]) + "'"
+                updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
                 
                 try:
                     self.db.update(updata_str)
@@ -66,7 +65,7 @@ class Erc20Data():
         print('get_erc20_data', recordDate)
         
     def get_top100_hold(self):
-        sel_str = "SELECT a.id_timestamps, b.erc20_contract, a.token_hold_num from erc20_data as a, token_base as b WHERE top100_detail = 0 AND a.token_id = b.id"
+        sel_str = "SELECT a.token_id, a.get_data_time, b.erc20_contract, a.token_hold_num from erc20_data as a, token_base as b WHERE top100_detail = 0 AND a.token_id = b.id"
         
         while True:
             res_sel = self.db.select(sel_str)
@@ -74,7 +73,7 @@ class Erc20Data():
             if len(res_sel) <= 0:
                 break
             for token_bace in res_sel:
-                url = config.eth_token_url + token_bace[1]
+                url = config.eth_token_url + token_bace[2]
                 self.driver.get(url)
                 try:
                     self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_li_balances"]/a').click()
@@ -105,8 +104,9 @@ class Erc20Data():
                             address = element.find_element_by_xpath('./td/span').text.replace(',', '')
                             quantity = element.find_element_by_xpath('./td[3]').text.replace(',', '')
                             percentage = element.find_element_by_xpath('./td[4]').text.replace(',', '').replace('%', '')
-                            insert_str = "INSERT INTO hold_top_100 (id_timestamps, rank, address, quantity, percentage, creat_at)"
-                            insert_str += "VALUES ('" + token_bace[0] + "'," + str(rank) +  ",'" + str(address)  + "'," + str(quantity) + "," + str(percentage) + ",'" + recordDate + "');"
+                            insert_str = "INSERT INTO hold_top_100 (token_id, get_data_time, rank, address, quantity, percentage, creat_at)"
+                            insert_str += "VALUES (" + str(token_bace[0]) + "," + str(token_bace[1]) + "," + str(
+                                rank) +  ",'" + str(address)  + "'," + str(quantity) + "," + str(percentage) + ",'" + recordDate + "');"
                             insert_list.append(insert_str)
                         except:
                             continue
@@ -121,28 +121,29 @@ class Erc20Data():
                                 address = element.find_element_by_xpath('./td/span').text.replace(',', '')
                                 quantity = element.find_element_by_xpath('./td[3]').text.replace(',', '')
                                 percentage = element.find_element_by_xpath('./td[4]').text.replace(',', '').replace('%', '')
-                                insert_str = "INSERT INTO hold_top_100 (id_timestamps, rank, address, quantity, percentage, creat_at)"
-                                insert_str += "VALUES ('" + token_bace[0] + "'," + str(rank) +  ",'" + str(address)  + "'," + str(quantity) + "," + str(percentage) + ",'" + recordDate + "');"
+                                insert_str = "INSERT INTO hold_top_100 (token_id, get_data_time, rank, address, quantity, percentage, creat_at)"
+                                insert_str += "VALUES (" + str(token_bace[0]) + "," + str(token_bace[1]) + "," + str(
+                                    rank) +  ",'" + str(address)  + "'," + str(quantity) + "," + str(percentage) + ",'" + recordDate + "');"
                                 
                                 insert_list.append(insert_str)
                             except Exception as e:
                                 continue
 
-                    if len(insert_list) == 100 or len(insert_list) == token_bace[2]:
+                    if len(insert_list) == 100 or len(insert_list) == token_bace[3]:
                         try:
                             self.db.insert_list(insert_list)
                             
                             updata_str = "UPDATE erc20_data SET top100_detail=" + '1'
-                            updata_str += " where id_timestamps ='" + str(token_bace[0]) + "'"
+                            updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
                             try:
                                 self.db.update(updata_str)
                             except Exception as e:
                                 print(updata_str)
                                 print('UPDATE err updata_str, token_id = ', token_bace[0])
                         except Exception as e:
-                            print('INSERT err internet_data, >50 id_timestamps = ', token_bace[0])
+                            print('INSERT err internet_data, >50 token_id = ', token_bace[0])
                 except:
-                    print('Timed out waiting for page to load. id_timestamps:', token_bace[0])
+                    print('Timed out waiting for page to load. token_id:', token_bace[0])
             time.sleep(30)
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_top100_hold', recordDate)
@@ -153,8 +154,8 @@ class Erc20Data():
         
 if __name__ == "__main__":
     erc20_pro = Erc20Data()
-    erc20_pro.erc20_data_key()
-    erc20_pro.get_erc20_data()
+    #erc20_pro.erc20_data_key()
+    #erc20_pro.get_erc20_data()
     erc20_pro.get_top100_hold()
     erc20_pro.driver_close()
     

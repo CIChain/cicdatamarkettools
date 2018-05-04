@@ -16,7 +16,6 @@ class TxDataPro():
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_tx_data', recordDate)
         for token_bace in db_res:
-            id_timestamps = str(token_bace[0]) + '_' + str(timestamps)
             res_html = common_fun.get_url_html(token_bace[1])
             price_list = res_html.xpath('//*[@id="baseInfo"]//*[@class="coinprice"]//text()')
             
@@ -37,8 +36,8 @@ class TxDataPro():
             issued_num = res_html.xpath('//*[@id="baseInfo"]/div[1]/div[3]/div[4]/text()')[0].split(' ')[0].replace(',', '')
             change_rate_24h = res_html.xpath('//*[@id="baseInfo"]/div[1]/div[4]/div[5]/div/span/text()')[0].replace('%', '')
             
-            insert_str = "INSERT INTO erc20_tx_data (id_timestamps, issued_num, flow_num, tx_amount_24h, change_rate_24h, gains_24h, price_cny, price_usdt, price_btc, created_at)"
-            insert_str += "VALUES ('" + str(id_timestamps) + "','" + issued_num + "','" + str(flow_num) + "','"  + str(
+            insert_str = "INSERT INTO erc20_tx_data (token_id, get_data_time, issued_num, flow_num, tx_amount_24h, change_rate_24h, gains_24h, price_cny, price_usdt, price_btc, created_at)"
+            insert_str += "VALUES (" + str(token_bace[0]) + "," + str(timestamps) + ",'" + issued_num + "','" + str(flow_num) + "','"  + str(
                     tx_amount_24h) + "','"  + str(change_rate_24h) + "','"  + str(gains_24h) + "','"  + str(
                     price_cny) + "','"  + str(price_usdt) + "','"  + str(price_btc) + "','" + str(recordDate) + "')"
                 

@@ -82,15 +82,20 @@ class TokenBacePro():
             for element in self.driver.find_elements_by_xpath('//*[@id="ContentPlaceHolder1_tr_officialsite_2"]/td[2]/ul/li'):
                 original_str = element.find_element_by_xpath('./a').get_attribute('data-original-title')
                 if original_str.startswith('Github'):
-                    git_address = element.find_element_by_xpath('./a').get_attribute('href')
+                    if git_address == '':
+                        git_address = element.find_element_by_xpath('./a').get_attribute('href')
                 elif original_str.startswith('Telegram'):
-                    telegram_address = element.find_element_by_xpath('./a').get_attribute('href')
+                    if telegram_address == '':
+                        telegram_address = element.find_element_by_xpath('./a').get_attribute('href')
                 elif original_str.startswith('Facebook'):
-                    facebook_address = element.find_element_by_xpath('./a').get_attribute('href')
+                    if facebook_address == '':
+                        facebook_address = element.find_element_by_xpath('./a').get_attribute('href')
                 elif original_str.startswith('Twitter'):
-                    twitter_address = element.find_element_by_xpath('./a').get_attribute('href')
+                    if twitter_address == '':
+                        twitter_address = element.find_element_by_xpath('./a').get_attribute('href')
                 elif original_str.startswith('Whitepaper'):
-                    whitepaper_address = element.find_element_by_xpath('./a').get_attribute('href')
+                    if whitepaper_address == '':
+                        whitepaper_address = element.find_element_by_xpath('./a').get_attribute('href')
                     
             updata_str = "UPDATE token_base SET github_address='" + git_address + "', twitter_address='" + str(
                     twitter_address) + "', facebook_address='" + facebook_address + "', telegraph_address='" + str(
