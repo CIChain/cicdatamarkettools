@@ -47,20 +47,22 @@ class Erc20Data():
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
                 driver.get(url)
-                
-                token_holders = driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
-                token_holders = token_holders.strip().split(' ')[0]
-                tx_num = driver.find_element_by_xpath('//*[@id="totaltxns"]').text
-    
-                updata_str = "UPDATE erc20_data SET token_hold_num=" + token_holders + ", token_tx_num=" + str(tx_num)
-                updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
-                
                 try:
-                    self.db.update(updata_str)
-                except Exception as e:
-                    print(updata_str)
-                    print('UPDATE err internet_data, token_id = ', token_bace[0])
-                    continue
+                    token_holders = driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
+                    token_holders = token_holders.strip().split(' ')[0]
+                    tx_num = driver.find_element_by_xpath('//*[@id="totaltxns"]').text
+        
+                    updata_str = "UPDATE erc20_data SET token_hold_num=" + token_holders + ", token_tx_num=" + str(tx_num)
+                    updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
+
+                    try:
+                        self.db.update(updata_str)
+                    except Exception as e:
+                        print(updata_str)
+                        print('UPDATE err internet_data, token_id = ', token_bace[0])
+                        continue
+                except:
+                    print('xpath err')
                 
             driver.close()
             driver.service.stop()
