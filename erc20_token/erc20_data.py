@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 class Erc20Data():
     def __init__(self):
         self.db = Mysqldb(config.MySqlHost, config.MySqlUser, config.MySqlPasswd, config.MySqlDb, config.MySqlPort)
-        self.driver = webdriver.Chrome(executable_path = config.chromedriver)
+        #self.driver = webdriver.Chrome(executable_path = config.chromedriver)
     
     #由于网络原因，数据获取经常性的中断，所以需要分成多步来获取数据，原则上数据每天更新一次，每天0点启动脚本
     #首先通过时间戳和token id生成erc20_data的唯一标识，并且给每条数据标记未获取
@@ -43,13 +43,14 @@ class Erc20Data():
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
+            driver = webdriver.Chrome(executable_path = config.chromedriver)
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
-                self.driver.get(url)
+                driver.get(url)
                 
-                token_holders = self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
+                token_holders = driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
                 token_holders = token_holders.strip().split(' ')[0]
-                tx_num = self.driver.find_element_by_xpath('//*[@id="totaltxns"]').text
+                tx_num = driver.find_element_by_xpath('//*[@id="totaltxns"]').text
     
                 updata_str = "UPDATE erc20_data SET token_hold_num=" + token_holders + ", token_tx_num=" + str(tx_num)
                 updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
@@ -58,47 +59,53 @@ class Erc20Data():
                     self.db.update(updata_str)
                 except Exception as e:
                     print(updata_str)
-                    print('INSERT err internet_data, token_id = ', token_bace[0])
+                    print('UPDATE err internet_data, token_id = ', token_bace[0])
                     continue
+                
+            driver.close()
+            driver.service.stop()
 
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_erc20_data', recordDate)
         
+        
     def get_top100_hold(self):
-        sel_str = "SELECT a.token_id, a.get_data_time, b.erc20_contract, a.token_hold_num from erc20_data as a, token_base as b WHERE top100_detail = 0 AND a.token_id = b.id"
+        sel_str = "SELECT a.token_id, a.get_data_time, b.erc20_contract, a.token_hold_num from erc20_data as a, token_base as b WHERE top100_detail = 0 AND a.token_id = b.id LIMIT 30"
         
         while True:
             res_sel = self.db.select(sel_str)
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
+            driver = webdriver.Chrome(executable_path = config.chromedriver)
+            driver.maximize_window()
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
-                self.driver.get(url)
+                driver.get(url)
                 try:
-                    self.driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_li_balances"]/a').click()
+                    driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_li_balances"]/a').click()
                 except:
                     print('click err', time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-                    time.sleep(30)
+                    time.sleep(5)
                     continue
                 
                 try:
-                    self.driver.switch_to_alert().accept()
+                    driver.switch_to_alert().accept()
                 except:
                     pass
                 
-                self.driver.switch_to.frame('tokeholdersiframe')
+                driver.switch_to.frame('tokeholdersiframe')
                 xpath_str = '//*[@id="maintable"]/table/tbody/tr[2]/td[1]'
                 try:
                     element_present = EC.text_to_be_present_in_element((By.XPATH, xpath_str),'1')
-                    WebDriverWait(self.driver, 20, 1).until(element_present)
+                    WebDriverWait(driver, 20, 1).until(element_present)
                     
                     recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                    if len(self.driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr')) < 2:
+                    if len(driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr')) < 2:
                         print('rank data len less')
                         continue
                     insert_list = []
-                    for element in self.driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr'):
+                    for element in driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr'):
                         try:
                             rank = element.find_element_by_xpath('./td[1]').text.replace(',', '')
                             address = element.find_element_by_xpath('./td/span').text.replace(',', '')
@@ -111,11 +118,11 @@ class Erc20Data():
                         except:
                             continue
                         
-                    if token_bace[2] > 50:
-                        self.driver.find_element_by_xpath('//*[@id="PagingPanel"]/a[3]').click()
+                    if token_bace[3] > 50:
+                        driver.find_element_by_xpath('//*[@id="PagingPanel"]/a[3]').click()
                         element_present = EC.text_to_be_present_in_element((By.XPATH, xpath_str),'51')
-                        WebDriverWait(self.driver, 20, 1).until(element_present)
-                        for element in self.driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr'):
+                        WebDriverWait(driver, 20, 1).until(element_present)
+                        for element in driver.find_elements_by_xpath('//*[@id="maintable"]/table/tbody/tr'):
                             try:
                                 rank = element.find_element_by_xpath('./td[1]').text.replace(',', '')
                                 address = element.find_element_by_xpath('./td/span').text.replace(',', '')
@@ -128,7 +135,7 @@ class Erc20Data():
                                 insert_list.append(insert_str)
                             except Exception as e:
                                 continue
-
+                            
                     if len(insert_list) == 100 or len(insert_list) == token_bace[3]:
                         try:
                             self.db.insert_list(insert_list)
@@ -144,18 +151,17 @@ class Erc20Data():
                             print('INSERT err internet_data, >50 token_id = ', token_bace[0])
                 except:
                     print('Timed out waiting for page to load. token_id:', token_bace[0])
-            time.sleep(30)
+            
+            driver.close()
+            driver.service.stop()
+            time.sleep(5)
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_top100_hold', recordDate)
         
-    def driver_close(self):
-        self.driver.close()
-        
-        
+    
 if __name__ == "__main__":
     erc20_pro = Erc20Data()
     #erc20_pro.erc20_data_key()
-    #erc20_pro.get_erc20_data()
+    erc20_pro.get_erc20_data()
     erc20_pro.get_top100_hold()
-    erc20_pro.driver_close()
     

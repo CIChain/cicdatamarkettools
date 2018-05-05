@@ -16,7 +16,6 @@ if __name__ == "__main__":
         erc20_pro.erc20_data_key()
         erc20_pro.get_erc20_data()
         erc20_pro.get_top100_hold()
-        erc20_pro.driver_close()
     except:
         print('erc20_pro err')
         
