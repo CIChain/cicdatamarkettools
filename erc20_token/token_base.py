@@ -12,8 +12,8 @@ from selenium.webdriver.common.by import By
 class TokenBacePro():
     def __init__(self):
         self.db = Mysqldb(config.MySqlHost, config.MySqlUser, config.MySqlPasswd, config.MySqlDb, config.MySqlPort)
-        chromedriver = 'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
-        self.driver = webdriver.Chrome(executable_path = chromedriver)
+        #self.driver = webdriver.Chrome(executable_path = config.chromedriver)
+        self.driver = webdriver.Firefox()
 
     def get_token_address(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())

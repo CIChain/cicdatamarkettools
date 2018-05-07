@@ -43,7 +43,9 @@ class Erc20Data():
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
-            driver = webdriver.Chrome(executable_path = config.chromedriver)
+            
+            driver = webdriver.Firefox()
+            #driver = webdriver.Chrome(executable_path = config.chromedriver)
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
                 driver.get(url)
@@ -79,7 +81,8 @@ class Erc20Data():
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
-            driver = webdriver.Chrome(executable_path = config.chromedriver)
+            driver = webdriver.Firefox()
+            #driver = webdriver.Chrome(executable_path = config.chromedriver)
             driver.maximize_window()
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
