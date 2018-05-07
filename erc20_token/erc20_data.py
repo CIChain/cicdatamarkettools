@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
 class Erc20Data():
     def __init__(self):
@@ -34,6 +35,12 @@ class Erc20Data():
                 print('INSERT err internet_data, token_id = ', token_bace[0])
                 continue
         
+    def open_driver(self):
+        driver = webdriver.Firefox()
+        driver.set_page_load_timeout(20)
+        driver.maximize_window()
+        return driver
+        
     def get_erc20_data(self):
         recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('get_erc20_data', recordDate)
@@ -44,11 +51,15 @@ class Erc20Data():
             if len(res_sel) <= 0:
                 break
             
-            driver = webdriver.Firefox()
+            driver = self.open_driver()
+            
             #driver = webdriver.Chrome(executable_path = config.chromedriver)
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
-                driver.get(url)
+                try:
+                    driver.get(url)
+                except TimeoutException:
+                    driver.execute_script('window.stop()')
                 try:
                     token_holders = driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_divSummary"]/div[1]/table/tbody/tr[3]/td[2]').text
                     token_holders = token_holders.strip().split(' ')[0]
@@ -81,12 +92,15 @@ class Erc20Data():
             print(len(res_sel))
             if len(res_sel) <= 0:
                 break
-            driver = webdriver.Firefox()
+            driver = self.open_driver()
             #driver = webdriver.Chrome(executable_path = config.chromedriver)
-            driver.maximize_window()
             for token_bace in res_sel:
                 url = config.eth_token_url + token_bace[2]
-                driver.get(url)
+                try:
+                    driver.get(url)
+                except TimeoutException:
+                    driver.execute_script('window.stop()')
+                    
                 try:
                     driver.find_element_by_xpath('//*[@id="ContentPlaceHolder1_li_balances"]/a').click()
                 except:
