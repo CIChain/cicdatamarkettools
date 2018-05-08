@@ -36,7 +36,10 @@ class Erc20Data():
                 continue
         
     def open_driver(self):
-        driver = webdriver.Firefox()
+        options = webdriver.FirefoxOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Firefox(options=options)
+        
         driver.set_page_load_timeout(20)
         driver.maximize_window()
         return driver
@@ -89,9 +92,11 @@ class Erc20Data():
         
         while True:
             res_sel = self.db.select(sel_str)
-            print(len(res_sel))
+            recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            print(len(res_sel), recordDate)
             if len(res_sel) <= 0:
                 break
+            
             driver = self.open_driver()
             #driver = webdriver.Chrome(executable_path = config.chromedriver)
             for token_bace in res_sel:
