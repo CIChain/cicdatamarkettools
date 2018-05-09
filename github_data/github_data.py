@@ -50,7 +50,7 @@ class GithubDataPro():
                 
     def open_driver(self):
         options = webdriver.FirefoxOptions()
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         driver = webdriver.Firefox(options=options)
         driver.set_page_load_timeout(20)
         driver.maximize_window()
@@ -126,50 +126,14 @@ class GithubDataPro():
                     
             driver.close()
             driver.service.stop()
-            
-                
-            '''
-                res_html = common_fun.get_url_html(token_bace[1])
-                if res_html == 404:
-                    print('404:', token_bace[1])
-                    continue
-                elif res_html == 500:
-                    print('500', token_bace[1])
-                    continue
-                elif res_html == '':
-                    print('err:', token_bace[1])
-                    continue
-    
-                try:
-                    watch_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[1]/div/ul/li[1]/a[2]/text()')[0]
-                    star_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[1]/div/ul/li[2]/a[2]/text()')[0]
-                except:
-                    try:
-                        watch_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div/ul/li[1]/a[2]/text()')[0]
-                        star_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div/ul/li[2]/a[2]/text()')[0]
-                    except:
-                        watch_num = '0'
-                        star_num = '0'
-          
-            
-                watch_num = watch_num.strip().replace(',', '')
-                star_num = star_num.strip().replace(',', '')
-                fork_num = res_html.xpath('//*[@class="pagehead-actions"]/li[3]/a[2]')[0]
-                
-                commit_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div[1]/div[2]/div/div/ul/li[1]/a/span/text()')[0]
-                branches_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div[1]/div[2]/div/div/ul/li[2]/a/span/text()')[0]
-                releases_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div[1]/div[2]/div/div/ul/li[3]/a/span/text()')[0]
-                contributors_num = res_html.xpath('//*[@id="js-repo-pjax-container"]/div[2]/div[1]/div[2]/div/div/ul/li[4]/a/span/text()')[0]
-            '''
-                
-            
+
             
 if __name__ == "__main__":
     recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print('start', recordDate)
     git_pro = GithubDataPro()
-    #git_pro.get_gitaddress()
-    #git_pro.init_git_detail_data()
+    git_pro.get_gitaddress()
+    git_pro.init_git_detail_data()
     git_pro.get_detail_data()
     recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print('end', recordDate)
