@@ -78,7 +78,7 @@ class Erc20Data():
                         print('UPDATE err internet_data, token_id = ', token_bace[0])
                         continue
                 except:
-                    print('xpath err')
+                    print('xpath err', url)
                 
             driver.close()
             driver.service.stop()
@@ -185,7 +185,7 @@ class Erc20Data():
     
 if __name__ == "__main__":
     erc20_pro = Erc20Data()
-    #erc20_pro.erc20_data_key()
+    erc20_pro.erc20_data_key()
     erc20_pro.get_erc20_data()
     erc20_pro.get_top100_hold()
     
