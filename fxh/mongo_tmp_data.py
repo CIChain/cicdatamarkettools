@@ -4,6 +4,7 @@ import csv
 import time
 import pandas as pd
 import updata_mysql
+import math
 
 class MongoDataProcess():
     def __init__(self):
@@ -31,37 +32,34 @@ class MongoDataProcess():
                      'change_rate_24h', 'total_value', 'logo', 'time_data', 'exchange_amount_24h',
                      'exchange_price','gains_24h']
         
-        for one_data in self.fxh_data.find():
-            if one_data['time_data'] > time_data - 604800 and one_data['time_data'] < time_data: 
-                for key in one_data.keys():
-                    if key in self.exchange:
-                        one_write_data = {}
-                        for data in one_data[key]:
-                            one_line = []
-                            one_line.append(data['token_name'])
-                            one_line.append(data['cn_name'])
-                            one_line.append(data['en_name'])
-                            one_line.append(data['price_cny'])
-                            one_line.append(data['price_usdt'])
-                            one_line.append(data['tx_amount_24h'])
-                            one_line.append(data['change_rate_24h'].replace('?', '0'))
-                            one_line.append(data['total_value'])
-                            one_line.append(data['logo'])
-                            one_line.append(one_data['time_data'])
-                            one_line.append(float(data['exchange_amount_24h'].replace('?', '0')))
-                            one_line.append(float(data['exchange_price'].replace('?', '0')))
-                            one_line.append(data['gains_24h'])
-                            
-                            if data['en_name'] not in one_write_data.keys():
-                                one_write_data[data['en_name']] = one_line
-                            else:
-                                one_write_data[data['en_name']][10] += float(data['exchange_amount_24h'].replace('?', '0'))
-                                one_write_data[data['en_name']][11] = (one_write_data[data['en_name']][11] + float(data['exchange_price'].replace('?', '0')))/2
-                            
-                        for one_write_key in one_write_data.keys():
-                            write_data[key].append(one_write_data[one_write_key])
-            else:
-                print(one_data['time_data'])
+        befo_data = time_data - 604800
+        for one_data in self.fxh_data.find({"time_data":{'$gt':befo_data,'$lt':time_data}}):
+            for key in one_data.keys():
+                if key in self.exchange:
+                    one_write_data = {}
+                    for data in one_data[key]:
+                        one_line = []
+                        one_line.append(data['token_name'])
+                        one_line.append(data['cn_name'])
+                        one_line.append(data['en_name'])
+                        one_line.append(data['price_cny'])
+                        one_line.append(data['price_usdt'])
+                        one_line.append(data['tx_amount_24h'])
+                        one_line.append(data['change_rate_24h'].replace('?', '0'))
+                        one_line.append(data['total_value'])
+                        one_line.append(data['logo'])
+                        one_line.append(one_data['time_data'])
+                        one_line.append(float(data['exchange_amount_24h'].replace('?', '0')))
+                        one_line.append(float(data['exchange_price'].replace('?', '0')))
+                        one_line.append(data['gains_24h'])
+                        if data['token_name'] not in one_write_data.keys():
+                            one_write_data[data['token_name']] = one_line
+                        else:
+                            one_write_data[data['token_name']][10] += float(data['exchange_amount_24h'].replace('?', '0'))
+                            one_write_data[data['token_name']][11] = (one_write_data[data['token_name']][11] + float(data['exchange_price'].replace('?', '0')))/2
+                       
+                    for one_write_key in one_write_data.keys():
+                        write_data[key].append(one_write_data[one_write_key])
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print('end_time = ', end_time)
@@ -81,70 +79,70 @@ class MongoDataProcess():
                 if row[0] == 'token_name':
                     continue
                 
-                if row[2] not in all_data.keys():
-                    all_data[row[2]] = []
-                    all_data[row[2]].append(row[0])
-                    all_data[row[2]].append(row[1])
-                    all_data[row[2]].append(row[2])
-                    all_data[row[2]].append([])
-                    all_data[row[2]][3].append(float(row[3].replace(',', '')))
-                    all_data[row[2]].append([])
-                    all_data[row[2]][4].append(float(row[4].replace(',', '')))
-                    all_data[row[2]].append([])
-                    all_data[row[2]][5].append(float(row[5].replace(',', '')))
-                    all_data[row[2]].append([])
-                    all_data[row[2]][6].append(float(row[6].replace(',', '').replace('%', '')))
-                    all_data[row[2]].append([])
-                    all_data[row[2]][7].append(float(row[7].replace(',', '')))
+                if row[0] not in all_data.keys():
+                    all_data[row[0]] = []
+                    all_data[row[0]].append(row[0])
+                    all_data[row[0]].append(row[1])
+                    all_data[row[0]].append(row[2])
+                    all_data[row[0]].append([])
+                    all_data[row[0]][3].append(float(row[3].replace(',', '')))
+                    all_data[row[0]].append([])
+                    all_data[row[0]][4].append(float(row[4].replace(',', '')))
+                    all_data[row[0]].append([])
+                    all_data[row[0]][5].append(float(row[5].replace(',', '')))
+                    all_data[row[0]].append([])
+                    all_data[row[0]][6].append(float(row[6].replace(',', '').replace('%', '')))
+                    all_data[row[0]].append([])
+                    all_data[row[0]][7].append(float(row[7].replace(',', '')))
                     
-                    all_data[row[2]].append(row[8])
-                    all_data[row[2]].append(row[9])
-                    all_data[row[2]].append([])
-                    all_data[row[2]][10].append(float(row[10].replace(',', '')))
-                    all_data[row[2]].append([])
-                    all_data[row[2]][11].append(float(row[11].replace(',', '')))
+                    all_data[row[0]].append(row[8])
+                    all_data[row[0]].append(row[9])
+                    all_data[row[0]].append([])
+                    all_data[row[0]][10].append(float(row[10].replace(',', '')))
+                    all_data[row[0]].append([])
+                    all_data[row[0]][11].append(float(row[11].replace(',', '')))
                     
                 else:
-                    if row[9] not in all_data[row[2]][9]:
-                        all_data[row[2]][3].append(float(row[3].replace(',', '')))
-                        all_data[row[2]][4].append(float(row[4].replace(',', '')))
-                        all_data[row[2]][5].append(float(row[5].replace(',', '')))
-                        all_data[row[2]][6].append(float(row[6].replace(',', '').replace('%', '')))
-                        all_data[row[2]][7].append(float(row[7].replace(',', '')))
-                        all_data[row[2]][10].append(float(row[10].replace(',', '')))
-                        all_data[row[2]][11].append(float(row[11].replace(',', '')))
+                    if row[9] not in all_data[row[0]][9]:
+                        all_data[row[0]][3].append(float(row[3].replace(',', '')))
+                        all_data[row[0]][4].append(float(row[4].replace(',', '')))
+                        all_data[row[0]][5].append(float(row[5].replace(',', '')))
+                        all_data[row[0]][6].append(float(row[6].replace(',', '').replace('%', '')))
+                        all_data[row[0]][7].append(float(row[7].replace(',', '')))
+                        all_data[row[0]][10].append(float(row[10].replace(',', '')))
+                        all_data[row[0]][11].append(float(row[11].replace(',', '')))
                     else:
                         print('重复重复', key, row[9])
                     
             csvFile.close()
-            for en_name in all_data.keys():
-                all_data[en_name][3].remove(min(all_data[en_name][3]))
-                all_data[en_name][3].remove(max(all_data[en_name][3]))           
-                all_data[en_name][3] = sum(all_data[en_name][3])/len(all_data[en_name][3])
+            for token_name in all_data.keys():
+                all_data[token_name][3].remove(min(all_data[token_name][3]))
+                all_data[token_name][3].remove(max(all_data[token_name][3]))           
+                all_data[token_name][3] = sum(all_data[token_name][3])/len(all_data[token_name][3])
                 
-                all_data[en_name][4].remove(min(all_data[en_name][4]))
-                all_data[en_name][4].remove(max(all_data[en_name][4]))           
-                all_data[en_name][4] = sum(all_data[en_name][4])/len(all_data[en_name][4])
+                all_data[token_name][4].remove(min(all_data[token_name][4]))
+                all_data[token_name][4].remove(max(all_data[token_name][4]))           
+                all_data[token_name][4] = sum(all_data[token_name][4])/len(all_data[token_name][4])
                 
-                all_data[en_name][5].remove(min(all_data[en_name][5]))
-                all_data[en_name][5].remove(max(all_data[en_name][5]))           
-                all_data[en_name][5] = sum(all_data[en_name][5])/len(all_data[en_name][5])
+                all_data[token_name][5].remove(min(all_data[token_name][5]))
+                all_data[token_name][5].remove(max(all_data[token_name][5]))           
+                all_data[token_name][5] = sum(all_data[token_name][5])/len(all_data[token_name][5])
                 
-                all_data[en_name][6].remove(min(all_data[en_name][6]))
-                all_data[en_name][6].remove(max(all_data[en_name][6]))           
-                all_data[en_name][6] = sum(all_data[en_name][6])/len(all_data[en_name][6])
+                all_data[token_name][6].remove(min(all_data[token_name][6]))
+                all_data[token_name][6].remove(max(all_data[token_name][6]))           
+                all_data[token_name][6] = sum(all_data[token_name][6])/len(all_data[token_name][6])
                 
-                all_data[en_name][7].remove(min(all_data[en_name][7]))
-                all_data[en_name][7].remove(max(all_data[en_name][7]))           
-                all_data[en_name][7] = sum(all_data[en_name][7])/len(all_data[en_name][7])
+                all_data[token_name][7].remove(min(all_data[token_name][7]))
+                all_data[token_name][7].remove(max(all_data[token_name][7]))           
+                all_data[token_name][7] = sum(all_data[token_name][7])/len(all_data[token_name][7])
                 
-                all_data[en_name][10].remove(min(all_data[en_name][10]))
-                all_data[en_name][10].remove(max(all_data[en_name][10]))           
-                all_data[en_name][10] = sum(all_data[en_name][10])/len(all_data[en_name][10])
+                all_data[token_name][10].remove(min(all_data[token_name][10]))
+                all_data[token_name][10].remove(max(all_data[token_name][10]))           
+                all_data[token_name][10] = sum(all_data[token_name][10])/len(all_data[token_name][10])
                 
-                all_data[en_name][11].remove(min(all_data[en_name][11]))
-                all_data[en_name][11].remove(max(all_data[en_name][11]))           
-                all_data[en_name][11] = sum(all_data[en_name][11])/len(all_data[en_name][11])
+                all_data[token_name][11].remove(min(all_data[token_name][11]))
+                all_data[token_name][11].remove(max(all_data[token_name][11]))           
+                all_data[token_name][11] = sum(all_data[token_name][11])/len(all_data[token_name][11])
                 
             file_name = key + '_clean_data.csv'
             head_line = ['token_name', 'cn_name', 'en_name', 'price_cny', 'price_usdt', 'tx_amount_24h',
@@ -154,8 +152,8 @@ class MongoDataProcess():
             writer = csv.writer(csvFile)
             writer.writerow(head_line)
             
-            for en_name in all_data.keys():
-                writer.writerow(all_data[en_name])
+            for token_name in all_data.keys():
+                writer.writerow(all_data[token_name])
             csvFile.close()
             
         
@@ -184,9 +182,24 @@ class MongoDataProcess():
             return shizhi/btc_shizhi.values[0]
         
         df['shizhi_amount'] = df['new_amount'] * df['total_value'].map(shizhi)
-        percent_df = df.describe(percentiles = [0.1,0.3,0.7,0.9])
-        print(percent_df)
+        
+        
+        df = df.sort_values(['shizhi_amount'], ascending=False).reset_index()
+        index_max = df.shape[0]
+        
         def number_to_star(number):
+            if number > df.loc[20, ['shizhi_amount']].values[0]:
+                return 1
+            elif number > df.loc[20 + math.floor(index_max * 0.15), ['shizhi_amount']].values[0]:
+                return 2
+            elif number < df.loc[ math.floor(index_max * 0.95), ['shizhi_amount']].values[0] :
+                return 5
+            elif number < df.loc[ math.floor(index_max * 0.7), ['shizhi_amount']].values[0] :
+                return 4
+            else:
+                return 3
+            
+            '''
             if number <= percent_df.loc['10%', 'shizhi_amount']:
                 return 5
             elif number > percent_df.loc['10%', 'shizhi_amount'] and number <= percent_df.loc['30%', 'shizhi_amount']:
@@ -197,9 +210,10 @@ class MongoDataProcess():
                 return 2
             elif number > percent_df.loc['90%', 'shizhi_amount']:
                 return 1
+                '''
+                
             
         df['star'] = df['shizhi_amount'].map(number_to_star)
-        print(len(df.loc[df['token_name'] == 'CIC']['star'].values))
         if len(df.loc[df['token_name'] == 'CIC']['star'].values) > 0:
             if df.loc[df['token_name'] == 'CIC']['star'].values[0] > 2:
                 df.loc[df['token_name'] == 'CIC', ['star']] = 2
@@ -229,7 +243,8 @@ class MongoDataProcess():
                 
 if __name__ == '__main__':
     data_process = MongoDataProcess()
-    data_process.get_mongo_data()
+    #data_process.get_mongo_data()
     data_process.data_clean()
     data_process.make_all_risk_data()
-    updata_mysql.updata_all_tosql()
+    #data_process.make_risk_data('OKEX')
+    #updata_mysql.updata_all_tosql()

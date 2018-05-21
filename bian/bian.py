@@ -1,13 +1,12 @@
 import requests
-from pymongo import MongoClient
 import time
     
 class Bian(object):
     def __init__(self): 
         self.base_url = 'https://api.binance.com'
-        client = MongoClient("mongodb://user:pw@ip:port")
-        self.db_mongo = client.Simba
-        self.bian_collection = self.db_mongo.bian
+        #client = MongoClient("mongodb://user:pw@ip:port")
+        #self.db_mongo = client.Simba
+        #self.bian_collection = self.db_mongo.bian
         self.symbols = []
         self.quot_asset = ['BTC', 'ETH', 'USDT', 'BNB']
         
@@ -47,6 +46,7 @@ class Bian(object):
         
     def symbol_data(self):
         request_url = self.base_url + '/api/v1/exchangeInfo'
+        print(request_url)
         res_json = self.get_url_json(request_url)
         for symbol in res_json['symbols']:
             one_symbol = {}
@@ -59,5 +59,5 @@ class Bian(object):
 if __name__ == "__main__":
     bi_an = Bian()
     bi_an.symbol_data()
-    bi_an.all_kline_datas('1d')
+    #bi_an.all_kline_datas('1d')
     #bi_an.kline_data('LTCBTC', '1d')

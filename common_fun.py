@@ -11,6 +11,8 @@ def get_url_json(url, headers = None):
         time.sleep(0.3)
         try:
             response  = requests.get(url, headers=headers)
+            if response.status_code == 500 or response.status_code == 404:
+                return response.status_code
             res = True
             return response.json()
         except:
