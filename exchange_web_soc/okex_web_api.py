@@ -1,12 +1,10 @@
 import websocket
 import time
 import _thread
+import common_fun
 
-def on_open(self):
-    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_deals'}")
-    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_ticker'}")
-    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_depth'}")
-    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_kline_1min'}")
+def on_open(self, events):
+    self.send(events)
     
     def run(*args):
         while True:
@@ -27,13 +25,40 @@ def on_close(self,evt):
     
 def on_ping(self):
     self.send("{'event':'ping'}")
+    
+class WebClient():
+    def __init__(self):
+        self.url = "wss://real.okex.com:10440/websocket/okexapi"
+        self.base_url = 'https://www.okex.com/api/v1/'  
+        self.headers = {
+                "Content-type" : "application/x-www-form-urlencoded",
+                }
+        self.web_events = []
+    
+    def make_events_by_symbols(self):
+        request_url = self.base_url + 'tickers.do'
+        res_json = common_fun.get_url_json(request_url, self.headers)
+        for ticker in res_json['tickers']:
+            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_deals'}"
+            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_ticker'}"
+            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_depth'}"
+            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_kline_1min'}"
+            self.web_events.append(web_event)
+                 
+        print(len(self.web_events))
+        time.sleep(3)
+        
+    def run(self):
+        websocket.enableTrace(False)
+        self.ws = websocket.WebSocketApp(self.url,
+                                    on_message = on_message,
+                                    on_error = on_error,
+                                    on_close = on_close)
+        
+        self.ws.on_open = on_open(self.web_events)
+        self.ws.run_forever()
 
 if __name__ == "__main__":
-    url = "wss://real.okex.com:10440/websocket/okexapi"      #if okcoin.cn  change url wss://real.okcoin.cn:10440/websocket/okcoinapi
-    websocket.enableTrace(False)
-    ws = websocket.WebSocketApp(url,
-                                on_message = on_message,
-                                on_error = on_error,
-                                on_close = on_close)
-    ws.on_open = on_open
-    ws.run_forever()
+    web_client = WebClient()
+    web_client.make_events_by_symbols()
+    web_client.run()
