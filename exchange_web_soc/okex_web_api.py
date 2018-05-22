@@ -1,20 +1,25 @@
 import websocket
 import time
-import thread
+import _thread
 
 def on_open(self):
     self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_deals'}")
+    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_ticker'}")
+    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_depth'}")
+    self.send("{'event':'addChannel','channel':'ok_sub_spot_eth_btc_kline_1min'}")
+    
     def run(*args):
         while True:
             time.sleep(20)
+            recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            print('pint time', recordDate)
             self.send("{'event':'ping'}")
-    thread.start_new_thread(run, ())
+    _thread.start_new_thread(run, ())
 
 def on_message(self,evt):
     print(evt)
     
 def on_error(self,evt):
-    print('==================')
     print (evt)
 
 def on_close(self,evt):
