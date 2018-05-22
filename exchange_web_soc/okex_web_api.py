@@ -1,10 +1,15 @@
 import websocket
 import time
 import _thread
+import sys
+import os
+path = os.getcwd()
+sys.path.append(path)
 import common_fun
 
-def on_open(self, events):
-    self.send(events)
+web_events = []
+def on_open(self):
+    self.send(web_events)
     
     def run(*args):
         while True:
@@ -33,7 +38,7 @@ class WebClient():
         self.headers = {
                 "Content-type" : "application/x-www-form-urlencoded",
                 }
-        self.web_events = []
+        
     
     def make_events_by_symbols(self):
         request_url = self.base_url + 'tickers.do'
@@ -43,9 +48,9 @@ class WebClient():
             web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_ticker'}"
             web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_depth'}"
             web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_kline_1min'}"
-            self.web_events.append(web_event)
+            web_events.append(web_event)
                  
-        print(len(self.web_events))
+        print(len(web_events))
         time.sleep(3)
         
     def run(self):
@@ -55,7 +60,7 @@ class WebClient():
                                     on_error = on_error,
                                     on_close = on_close)
         
-        self.ws.on_open = on_open(self.web_events)
+        self.ws.on_open = on_open()
         self.ws.run_forever()
 
 if __name__ == "__main__":
