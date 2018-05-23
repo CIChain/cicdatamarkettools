@@ -28,7 +28,7 @@ def on_message(self,evt):
 def on_error(self,evt):
     print (evt)
 
-def on_close(self,evt):
+def on_close(self):
     print ('DISCONNECT')
     self.WebSocketApp(self.url, on_message = on_message, on_error = on_error, on_close = on_close)
     self.on_open = on_open
