@@ -9,9 +9,16 @@ import common_fun
 
 web_events = []
 def on_open(self):
-    self.send(str(web_events[0:100]))
+    def run(n_start, n_end):
+        self.send(str(web_events[n_start:n_end]))
+        
+    for index in range(len(web_events)/100):
+        if (index + 1) * 100 < len(web_events):
+            _thread.start_new_thread(run, (index * 100, (index + 1) * 100))
+        else:
+            _thread.start_new_thread(run, (index * 100, len(web_events)))
     
-    def run(*args):
+    def ping(*args):
         while True:
             time.sleep(20)
             recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
