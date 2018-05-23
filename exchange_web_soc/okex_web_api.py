@@ -4,11 +4,13 @@ import _thread
 
 events = []
 
-def on_open_deals(self):
+def on_open(self):
     def run(n_start, n_end):
+        time.sleep(15)
         self.send(str(events[n_start:n_end]))
         
-    for index in range(len(events)/100):
+    for index in range(int(len(events)/100)):
+        time.sleep(5)
         if (index + 1) * 100 < len(events):
             _thread.start_new_thread(run, (index * 100, (index + 1) * 100))
         else:
@@ -44,12 +46,12 @@ class WebClient():
                          
     def run(self):
         websocket.enableTrace(False)
-        self.ws = self.WebSocketApp(self.url,
-                                    on_message = self.on_message,
-                                    on_error = self.on_error,
-                                    on_close = self.on_close)
+        self.ws = websocket.WebSocketApp(self.url,
+                                    on_message = on_message,
+                                    on_error = on_error,
+                                    on_close = on_close)
         
-        self.ws.on_open = self.on_open
+        self.ws.on_open = on_open
         self.ws.run_forever()
 
 if __name__ == "__main__":
