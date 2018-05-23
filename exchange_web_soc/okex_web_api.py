@@ -5,17 +5,6 @@ import _thread
 events = []
 
 def on_open(self):
-    def run(n_start, n_end):
-        time.sleep(15)
-        self.send(str(events[n_start:n_end]))
-        
-    for index in range(int(len(events)/100)):
-        time.sleep(5)
-        if (index + 1) * 100 < len(events):
-            _thread.start_new_thread(run, (index * 100, (index + 1) * 100))
-        else:
-            _thread.start_new_thread(run, (index * 100, len(events)))
-    
     def ping(*args):
         while True:
             time.sleep(5)
@@ -23,6 +12,13 @@ def on_open(self):
             print('pint time', recordDate)
             self.send("{'event':'ping'}")
     _thread.start_new_thread(ping, ())
+    
+    for index in range(len(events)/100):
+        time.sleep(2)
+        if (index + 1) * 100 < len(events):
+            self.send(str(events[index * 100:(index + 1) * 100]))
+        else:
+            self.send(str(events[index * 100: (index + 1) * 100]))
 
 def on_message(self,evt):
     print(evt)
@@ -40,7 +36,13 @@ class WebClient():
 
     def make_events(self, symbols, event_type):
         for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + event_type}
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_deals'}
+            events.append(web_event)
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_ticker'}
+            events.append(web_event)
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_depth'}
+            events.append(web_event)
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_kline_1min'}
             events.append(web_event)
 
                          
