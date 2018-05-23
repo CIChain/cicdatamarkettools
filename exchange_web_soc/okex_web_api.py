@@ -13,15 +13,17 @@ def on_open(self):
             self.send("{'event':'ping'}")
     _thread.start_new_thread(ping, ())
     
-    for index in range(len(events)/100):
-        time.sleep(2)
+    def run(n_start, n_end, sleep_time):
+        time.sleep(sleep_time)
+        self.send(str(events[n_start:n_end]))
+    for index in range(int(len(events)/100)):
         if (index + 1) * 100 < len(events):
-            self.send(str(events[index * 100:(index + 1) * 100]))
+            _thread.start_new_thread(run, (index * 100, (index + 1) * 100, index))
         else:
-            self.send(str(events[index * 100: (index + 1) * 100]))
+            _thread.start_new_thread(run, (index * 100, len(events), index))
 
 def on_message(self,evt):
-    print(evt)
+    print(evt[0]['channel'])
     
 def on_error(self,evt):
     print (evt)
@@ -34,7 +36,7 @@ class WebClient():
         self.url = "wss://real.okex.com:10440/websocket/okexapi"
         self.symbols = []
 
-    def make_events(self, symbols, event_type):
+    def make_events(self, symbols):
         for symbol in symbols:
             web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_deals'}
             events.append(web_event)
