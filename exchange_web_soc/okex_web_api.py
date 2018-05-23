@@ -23,7 +23,7 @@ def on_open(self):
             _thread.start_new_thread(run, (index * 100, len(events), index))
 
 def on_message(self,evt):
-    print(evt[0]['channel'])
+    print(evt)
     
 def on_error(self,evt):
     print (evt)
