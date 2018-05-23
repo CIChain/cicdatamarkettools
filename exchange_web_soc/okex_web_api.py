@@ -9,7 +9,7 @@ import common_fun
 
 web_events = []
 def on_open(self):
-    self.send(web_events)
+    self.send(str(web_events[0:100]))
     
     def run(*args):
         while True:
@@ -38,21 +38,18 @@ class WebClient():
         self.headers = {
                 "Content-type" : "application/x-www-form-urlencoded",
                 }
-        
     
     def make_events_by_symbols(self):
         request_url = self.base_url + 'tickers.do'
         res_json = common_fun.get_url_json(request_url, self.headers)
         for ticker in res_json['tickers']:
-            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_deals'}"
-            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_ticker'}"
-            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_depth'}"
-            web_event = "{'event':'addChannel','channel':'ok_sub_spot_" + ticker['symbol'] +"_kline_1min'}"
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + ticker['symbol'] +'_deals'}
+            #web_event = {'event':'addChannel','channel':'ok_sub_spot_' + ticker['symbol'] +'_ticker'}
+            #web_event = {'event':'addChannel','channel':'ok_sub_spot_' + ticker['symbol'] +'_depth'}
+            #web_event = {'event':'addChannel','channel':'ok_sub_spot_' + ticker['symbol'] +'_kline_1min'}
+
             web_events.append(web_event)
-                 
-        print(len(web_events))
-        time.sleep(3)
-        
+                         
     def run(self):
         websocket.enableTrace(False)
         self.ws = websocket.WebSocketApp(self.url,
@@ -60,7 +57,7 @@ class WebClient():
                                     on_error = on_error,
                                     on_close = on_close)
         
-        self.ws.on_open = on_open()
+        self.ws.on_open = on_open
         self.ws.run_forever()
 
 if __name__ == "__main__":
