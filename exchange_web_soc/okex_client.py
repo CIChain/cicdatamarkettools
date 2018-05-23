@@ -19,13 +19,12 @@ for ticker in res_json['tickers']:
         symbols.append(ticker['symbol'])
 
 
-
-def run_client(event_type):
+def run_client(*args):
     web_client = okex_web_api.WebClient()
-    web_client.make_events(symbols, event_type)
+    web_client.make_events(symbols, args[0])
     web_client.run()
 
-_thread.start_new_thread(run_client, ('_deals'))
-_thread.start_new_thread(run_client, ('_ticker'))
-_thread.start_new_thread(run_client, ('_depth'))
-_thread.start_new_thread(run_client, ('_kline_1min'))
+_thread.start_new_thread(run_client, ('_deals',))
+_thread.start_new_thread(run_client, ('_ticker',))
+_thread.start_new_thread(run_client, ('_depth',))
+_thread.start_new_thread(run_client, ('_kline_1min',))
