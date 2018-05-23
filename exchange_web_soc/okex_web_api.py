@@ -9,6 +9,7 @@ import common_fun
 
 web_events = []
 def on_open(self):
+    '''
     def run(n_start, n_end):
         self.send(str(web_events[n_start:n_end]))
         
@@ -17,7 +18,7 @@ def on_open(self):
             _thread.start_new_thread(run, (index * 100, (index + 1) * 100))
         else:
             _thread.start_new_thread(run, (index * 100, len(web_events)))
-    
+    '''
     
     def ping(*args):
         while True:
@@ -25,7 +26,7 @@ def on_open(self):
             recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print('pint time', recordDate)
             self.send("{'event':'ping'}")
-    _thread.start_new_thread(run, ())
+    _thread.start_new_thread(ping, ())
 
 def on_message(self,evt):
     print(evt)
@@ -67,8 +68,12 @@ class WebClient():
         
         self.ws.on_open = on_open
         self.ws.run_forever()
+        
+    def send_events(self):
+        self.ws.send(web_events[0:10])
 
 if __name__ == "__main__":
     web_client = WebClient()
     web_client.make_events_by_symbols()
     web_client.run()
+    web_client.send_events()
