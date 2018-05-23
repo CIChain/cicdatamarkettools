@@ -30,9 +30,10 @@ def on_error(self,evt):
 
 def on_close(self):
     print ('DISCONNECT')
-    self.WebSocketApp(self.url, on_message = on_message, on_error = on_error, on_close = on_close)
-    self.on_open = on_open
-    self.run_forever()
+    websocket.enableTrace(False)
+    ws = websocket.WebSocketApp(self.url, on_message = on_message, on_error = on_error, on_close = on_close)
+    ws.on_open = on_open
+    ws.run_forever()
     
 class WebClient():
     def __init__(self):
