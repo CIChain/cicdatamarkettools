@@ -7,10 +7,10 @@ events = []
 def on_open(self):
     def ping(*args):
         while True:
-            time.sleep(5)
             recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            print('pint time', recordDate)
+            print('ping time', recordDate)
             self.send("{'event':'ping'}")
+            time.sleep(5)
     _thread.start_new_thread(ping, ())
     
     def run(n_start, n_end, sleep_time):
@@ -30,6 +30,9 @@ def on_error(self,evt):
 
 def on_close(self,evt):
     print ('DISCONNECT')
+    self.WebSocketApp(self.url, on_message = on_message, on_error = on_error, on_close = on_close)
+    self.on_open = on_open
+    self.run_forever()
     
 class WebClient():
     def __init__(self):
