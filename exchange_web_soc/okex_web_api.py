@@ -10,13 +10,14 @@ import common_fun
 web_events = []
 
     
-class WebClient(websocket):
+class WebClient(websocket.WebSocketApp):
     def __init__(self):
         self.url = "wss://real.okex.com:10440/websocket/okexapi"
         self.base_url = 'https://www.okex.com/api/v1/'  
         self.headers = {
                 "Content-type" : "application/x-www-form-urlencoded",
                 }
+        
     def on_open(self):
         '''
         def run(n_start, n_end):
