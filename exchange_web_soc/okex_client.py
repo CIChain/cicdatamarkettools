@@ -11,12 +11,12 @@ headers = {
         "Content-type" : "application/x-www-form-urlencoded",
         }
 
-web_client = okex_web_api.WebClient()
 request_url = base_url + 'tickers.do'
 res_json = common_fun.get_url_json(request_url, headers)
 for ticker in res_json['tickers']:
-    if ticker['symbol'] not in web_client.symbols:
+    if ticker['symbol'] not in okex_web_api.symbols:
         okex_web_api.symbols.append(ticker['symbol'])
-
+        
+web_client = okex_web_api.WebClient()
 web_client.make_ticker_events()
 web_client.run()
