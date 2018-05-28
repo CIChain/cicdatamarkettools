@@ -1,8 +1,10 @@
 import websocket
 import time
 import _thread
+import json
 
 events = []
+symbols = []
 
 def on_open(self):
     def ping(*args):
@@ -24,6 +26,17 @@ def on_open(self):
 
 def on_message(self,evt):
     print(evt)
+    res_data = json.loads(evt)
+    try:
+        for one_res in res_data:
+            channel_list = one_res['channel'].split('_')
+            symbol = channel_list[3] + '_' + channel_list[4]
+            if one_res['channel'].endswith('_ticker'):
+                print(symbol)
+                if symbol in symbols:
+                    print(one_res)
+    except:
+        pass
     
 def on_error(self,evt):
     print (evt)
@@ -40,15 +53,24 @@ class WebClient():
         self.url = "wss://real.okex.com:10440/websocket/okexapi"
         self.symbols = []
 
-    def make_events(self, symbols):
+    def make_ticker_events(self):
         for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_deals'}
-            events.append(web_event)
             web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_ticker'}
             events.append(web_event)
+            
+    def make_depth_events(self):
+        for symbol in symbols:
             web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_depth'}
             events.append(web_event)
+    
+    def make_kline_events(self):
+        for symbol in symbols:
             web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_kline_1min'}
+            events.append(web_event)
+            
+    def make_deals_events(self):
+        for symbol in symbols:
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_deals'}
             events.append(web_event)
 
                          
