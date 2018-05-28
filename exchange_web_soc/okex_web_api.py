@@ -18,21 +18,19 @@ def on_open(self):
     def run(n_start, n_end, sleep_time):
         time.sleep(sleep_time)
         self.send(str(events[n_start:n_end]))
-    for index in range(int(len(events)/100)):
+    for index in range(int(len(events)/100) + 1):
         if (index + 1) * 100 < len(events):
             _thread.start_new_thread(run, (index * 100, (index + 1) * 100, index))
         else:
             _thread.start_new_thread(run, (index * 100, len(events), index))
 
 def on_message(self,evt):
-    print(evt)
     res_data = json.loads(evt)
     try:
         for one_res in res_data:
             channel_list = one_res['channel'].split('_')
             symbol = channel_list[3] + '_' + channel_list[4]
             if one_res['channel'].endswith('_ticker'):
-                print(symbol)
                 if symbol in symbols:
                     print(one_res)
     except:
@@ -51,7 +49,6 @@ def on_close(self):
 class WebClient():
     def __init__(self):
         self.url = "wss://real.okex.com:10440/websocket/okexapi"
-        self.symbols = []
 
     def make_ticker_events(self):
         for symbol in symbols:
