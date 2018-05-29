@@ -71,26 +71,11 @@ class WebClient():
     def __init__(self):
         self.url = "wss://real.okex.com:10440/websocket/okexapi"
 
-    def make_ticker_events(self):
+    def make_events(self, event_type):
+        #event_type: _ticker, _depth, _kline_1min, _deals
         for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_ticker'}
+            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + event_type}
             events.append(web_event)
-            
-    def make_depth_events(self):
-        for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_depth'}
-            events.append(web_event)
-    
-    def make_kline_events(self):
-        for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_kline_1min'}
-            events.append(web_event)
-            
-    def make_deals_events(self):
-        for symbol in symbols:
-            web_event = {'event':'addChannel','channel':'ok_sub_spot_' + symbol + '_deals'}
-            events.append(web_event)
-
                          
     def run(self):
         websocket.enableTrace(False)

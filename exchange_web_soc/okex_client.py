@@ -19,5 +19,5 @@ for ticker in res_json['tickers']:
         okex_web_api.current_ticker[ticker['symbol']] = ''
         
 web_client = okex_web_api.WebClient()
-web_client.make_ticker_events()
+web_client.make_events('_ticker')
 web_client.run()
