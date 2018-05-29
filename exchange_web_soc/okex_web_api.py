@@ -47,11 +47,12 @@ def updata_current_ticker():
     for key in current_ticker.keys():
         data = current_ticker[key]
         sel_str = "select id from okex_current_ticker where currency = '" + key + "'"
-        if len(sel_str) > 0:
+        res_sel = db.select(sel_str)
+        if len(res_sel) > 0:
             updata_str = "UPDATE okex_current_ticker SET vol_24h='" + str(data['vol']) + "', high_24h='" + str(
                     data['high']) + "', low_24h='" + str(data['low']) + "', last='" + str(data['last']) + "', change_price='" + str(
                             data['change']) + "', timestamp='" + str(data['timestamp']) + "'"
-            updata_str += " where currency =" + str(key) + "'"
+            updata_str += " where currency ='" + str(key) + "'"
 
             sql_list.append(updata_str)
         else:
@@ -81,7 +82,7 @@ def on_message(self,evt):
                             data['low']) + "','" + str(data['last']) + "','" + str(data['change']) + "','" + str(data['timestamp']) + "')"
                     
                     ticker_sql_list.append(insert_str)
-                    current_ticker['symbol'] = data
+                    current_ticker[symbol] = data
         
         curr_time = int(time.time())
         global updata_time
