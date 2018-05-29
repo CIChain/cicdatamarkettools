@@ -2,6 +2,10 @@ import websocket
 import time
 import _thread
 import json
+import os
+import sys
+path = os.getcwd()
+sys.path.append(path)
 from mysqldb import Mysqldb
 import config
 
@@ -20,7 +24,7 @@ def on_open(self):
             recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print('ping time', recordDate)
             self.send("{'event':'ping'}")
-            time.sleep(5)
+            time.sleep(15)
     _thread.start_new_thread(ping, ())
     
     def run(n_start, n_end, sleep_time):
@@ -33,7 +37,10 @@ def on_open(self):
             _thread.start_new_thread(run, (index * 100, len(events), index))
             
 def insert_sql_data(insert_list):
-    db.insert_list()
+    try:
+        db.insert_list(insert_list)
+    except:
+        print(insert_list)
 
 def on_message(self,evt):
     res_data = json.loads(evt)
@@ -44,15 +51,16 @@ def on_message(self,evt):
             if one_res['channel'].endswith('_ticker'):
                 if symbol in symbols:
                     data = one_res['data']
-                    insert_str = "INSERT INTO okex_ticker (currency, vol_24h, high_24h, low_24h, last, change, timestamp)";
-                    insert_str += "VALUES ('" + symbol + "','" + data['vol'] + "','" + data['high'] + "','" + str(
-                            data['low'] + "','" + data['last']) + "','" + data['change'] + "','" + data['timestamp'] + "')"
+                    insert_str = "INSERT INTO okex_ticker (currency, vol_24h, high_24h, low_24h, last, change_price, timestamp)";
+                    insert_str += "VALUES ('" + symbol + "','" + str(data['vol']) + "','" + str(data['high']) + "','" + str(
+                            data['low']) + "','" + str(data['last']) + "','" + str(data['change']) + "','" + str(data['timestamp']) + "')"
                     
                     ticker_sql_list.append(insert_str)
         
         curr_time = int(time.time())
         if curr_time - updata_time > 60:
-            insert_list = ticker_sql_list
+            insert_list = ticker_sql_list[:]
+            ticker_sql_list.clear()
             insert_sql_data(insert_list)
     except:
         pass
