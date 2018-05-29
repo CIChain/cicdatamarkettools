@@ -16,6 +16,7 @@ res_json = common_fun.get_url_json(request_url, headers)
 for ticker in res_json['tickers']:
     if ticker['symbol'] not in okex_web_api.symbols:
         okex_web_api.symbols.append(ticker['symbol'])
+        okex_web_api.current_ticker[ticker['symbol']] = ''
         
 web_client = okex_web_api.WebClient()
 web_client.make_ticker_events()

@@ -2,9 +2,17 @@ import websocket
 import time
 import _thread
 import json
+from mysqldb import Mysqldb
+import config
 
 events = []
 symbols = []
+db = Mysqldb(config.MySqlHostTicker, config.MySqlUserTicker, config.MySqlPasswdTicker, config.MySqlDbTicker,
+             config.MySqlPortTicker)
+
+current_ticker = {}
+ticker_sql_list = []
+updata_time = int(time.time())
 
 def on_open(self):
     def ping(*args):
@@ -23,6 +31,9 @@ def on_open(self):
             _thread.start_new_thread(run, (index * 100, (index + 1) * 100, index))
         else:
             _thread.start_new_thread(run, (index * 100, len(events), index))
+            
+def insert_sql_data(insert_list):
+    db.insert_list()
 
 def on_message(self,evt):
     res_data = json.loads(evt)
@@ -32,7 +43,17 @@ def on_message(self,evt):
             symbol = channel_list[3] + '_' + channel_list[4]
             if one_res['channel'].endswith('_ticker'):
                 if symbol in symbols:
-                    print(one_res)
+                    data = one_res['data']
+                    insert_str = "INSERT INTO okex_ticker (currency, vol_24h, high_24h, low_24h, last, change, timestamp)";
+                    insert_str += "VALUES ('" + symbol + "','" + data['vol'] + "','" + data['high'] + "','" + str(
+                            data['low'] + "','" + data['last']) + "','" + data['change'] + "','" + data['timestamp'] + "')"
+                    
+                    ticker_sql_list.append(insert_str)
+        
+        curr_time = int(time.time())
+        if curr_time - updata_time > 60:
+            insert_list = ticker_sql_list
+            insert_sql_data(insert_list)
     except:
         pass
     
