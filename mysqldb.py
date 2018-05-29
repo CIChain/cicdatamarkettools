@@ -74,7 +74,7 @@ class Mysqldb:
             cur.close()
             con.close()
             
-    def insert_list(self, sql_list):
+    def execute_list(self, sql_list):
         try:
             con = self.getCon()
             cur = con.cursor()

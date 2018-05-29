@@ -38,9 +38,34 @@ def on_open(self):
             
 def insert_sql_data(insert_list):
     try:
-        db.insert_list(insert_list)
+        db.execute_list(insert_list)
     except:
         print(insert_list)
+        
+def updata_current_ticker():
+    sql_list = []
+    for key in current_ticker.keys():
+        data = current_ticker[key]
+        sel_str = "select id from okex_current_ticker where currency = '" + key + "'"
+        if len(sel_str) > 0:
+            updata_str = "UPDATE okex_current_ticker SET vol_24h='" + str(data['vol']) + "', high_24h='" + str(
+                    data['high']) + "', low_24h='" + str(data['low']) + "', last='" + str(data['last']) + "', change_price='" + str(
+                            data['change']) + "', timestamp='" + str(data['timestamp']) + "'"
+            updata_str += " where currency =" + str(key) + "'"
+
+            sql_list.append(updata_str)
+        else:
+            insert_str = "INSERT INTO okex_current_ticker (currency, vol_24h, high_24h, low_24h, last, change_price, timestamp)";
+            insert_str += "VALUES ('" + key + "','" + str(data['vol']) + "','" + str(data['high']) + "','" + str(
+                data['low']) + "','" + str(data['last']) + "','" + str(data['change']) + "','" + str(data['timestamp']) + "')"
+            
+            sql_list.append(insert_str)       
+            
+    try:
+        db.execute_list(sql_list)
+    except:
+        print(sql_list)
+        
 
 def on_message(self,evt):
     res_data = json.loads(evt)
@@ -56,12 +81,16 @@ def on_message(self,evt):
                             data['low']) + "','" + str(data['last']) + "','" + str(data['change']) + "','" + str(data['timestamp']) + "')"
                     
                     ticker_sql_list.append(insert_str)
+                    current_ticker['symbol'] = data
         
         curr_time = int(time.time())
+        global updata_time
         if curr_time - updata_time > 60:
             insert_list = ticker_sql_list[:]
             ticker_sql_list.clear()
             insert_sql_data(insert_list)
+            updata_current_ticker()
+            updata_time = curr_time
     except:
         pass
     

@@ -162,7 +162,7 @@ class Erc20Data():
                             
                     if len(insert_list) == 100 or len(insert_list) == token_bace[3]:
                         try:
-                            self.db.insert_list(insert_list)
+                            self.db.execute_list(insert_list)
                             
                             updata_str = "UPDATE erc20_data SET top100_detail=" + '1'
                             updata_str += " where token_id =" + str(token_bace[0]) + " and get_data_time=" + str(token_bace[1])
