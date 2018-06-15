@@ -53,7 +53,7 @@ class AppStatistics():
         subject = 'cichain用户数据统计'
         message['Subject'] = Header(subject, 'utf-8')
         
-        server = smtplib.SMTP(smtp_server, 25)
+        server = smtplib.SMTP_SSL(smtp_server, 465)
         server.login(from_addr, password)
         try:
             server.sendmail(from_addr, receivers, message.as_string())
