@@ -1,9 +1,13 @@
-import config
-from mysqldb import Mysqldb
 import time
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+import os
+import sys
+path = os.getcwd()
+sys.path.append(path)
+import config
+from mysqldb import Mysqldb
 
 class AppStatistics():
     def __init__(self):
