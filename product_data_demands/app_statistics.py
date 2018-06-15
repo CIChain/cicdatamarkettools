@@ -44,7 +44,7 @@ class AppStatistics():
     def send_email(self, mail_text):
         smtp_server = 'smtp.exmail.qq.com'
         from_addr = 'mayaoguang@datebao.com'
-        receivers = ['574788188@qq.com']
+        receivers = ['mayaoguang@datebao.com']
         password = 'Myg19891116'
         
         message = MIMEText(mail_text, 'plain', 'utf-8')
