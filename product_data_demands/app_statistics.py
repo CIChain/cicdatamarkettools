@@ -49,7 +49,7 @@ class AppStatistics():
         
         message = MIMEText(mail_text, 'plain', 'utf-8')
         message['From'] = Header("马耀光", 'utf-8')   # 发送者
-        message['To'] =  Header("冯晓钰", 'utf-8')        # 接收者
+        message['To'] =  Header("云保链", 'utf-8')        # 接收者
         subject = 'cichain用户数据统计'
         message['Subject'] = Header(subject, 'utf-8')
         
