@@ -38,6 +38,36 @@ def get_url_html(url):
             retry_time = retry_time - 1
             if retry_time <= 0:
                 return ''
+                
+def get_url_text(url, err_file):
+    res = False
+    retry_time = 5
+    while res == False:
+        time.sleep(0.3)
+        try:
+            response  = requests.get(url)
+            if response.status_code == 404:
+                with open(err_file, 'a+') as f:
+                    recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    err_srt = recordDate + ':' + 'get err, url = ' + url + ', err code = ' + str(response.status_code) + '\n'
+                    f.write(err_srt)
+                return ''
+            if response.status_code != 200:
+                retry_time = retry_time - 1
+                if retry_time <= 0:
+                    with open(err_file, 'a+') as f:
+                        recordDate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        err_srt = recordDate + ':' + 'get err, url = ' + url + ', err code = ' + str(response.status_code) + '\n'
+                        f.write(err_srt)
+                    return response.status_code
+                continue
+            return response.text
+        except:
+            print('get_url_html err,err url =', url)
+            res = False
+            retry_time = retry_time - 1
+            if retry_time <= 0:
+                return ''
             
 
 if __name__ == "__main__":
