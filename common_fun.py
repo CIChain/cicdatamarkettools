@@ -4,6 +4,7 @@
 import requests
 import time
 from lxml import etree
+import csv
 
 def get_url_json(url, headers = None):
     res = False
@@ -19,7 +20,6 @@ def get_url_json(url, headers = None):
             print('get_url_json err,err url =', url)
             res = False
     
-
 def get_url_html(url):
     res = False
     retry_time = 10
@@ -69,6 +69,15 @@ def get_url_text(url, err_file):
             if retry_time <= 0:
                 return ''
             
+def write_csv_file(file_name, write_data, head_line = None):
+    csvFile = open(file_name, 'w', newline='', encoding = 'utf8')
+    writer = csv.writer(csvFile)
+    if head_line != None:
+        writer.writerow(head_line)
+    for line in write_data:
+        writer.writerow(line)
+        
+    csvFile.close()
 
 if __name__ == "__main__":
     res_html = get_url_html('https://t.me/joinchat/GtLjl1JMYiTHzhaQA5CGPw')
